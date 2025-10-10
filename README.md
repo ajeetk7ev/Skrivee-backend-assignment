@@ -2,6 +2,12 @@
 
 A Node.js/TypeScript backend application for managing author rankings based on various metrics. This project implements a sophisticated ranking system that evaluates authors based on their fans, favorites, content creation, and profile completeness.
 
+## 🌐 Live Deployment
+
+**API Base URL:** https://skrivee-backend-assignment.onrender.com/api
+
+The application is deployed on Render and ready for use. You can test the API endpoints directly using the provided URLs.
+
 ## 🚀 Features
 
 - **Author Management**: Add and update author information
@@ -67,7 +73,9 @@ A Node.js/TypeScript backend application for managing author rankings based on v
 
 ## 📚 API Endpoints
 
-### Base URL: `http://localhost:3000/api`
+### Base URL: `https://skrivee-backend-assignment.onrender.com/api`
+
+**Local Development:** `http://localhost:3000/api`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -79,7 +87,7 @@ A Node.js/TypeScript backend application for managing author rankings based on v
 
 #### Add Author
 ```bash
-POST /api/authors
+POST https://skrivee-backend-assignment.onrender.com/api/authors
 Content-Type: application/json
 
 {
@@ -94,7 +102,7 @@ Content-Type: application/json
 
 #### Update Author
 ```bash
-PUT /api/authors/{author_id}
+PUT https://skrivee-backend-assignment.onrender.com/api/authors/{author_id}
 Content-Type: application/json
 
 {
@@ -109,7 +117,7 @@ Content-Type: application/json
 
 #### Get Rankings (with Pagination)
 ```bash
-GET /api/rankings?page=1&limit=10
+GET https://skrivee-backend-assignment.onrender.com/api/rankings?page=1&limit=10
 ```
 
 **Query Parameters:**
@@ -119,13 +127,13 @@ GET /api/rankings?page=1&limit=10
 **Examples:**
 ```bash
 # Get first page with default 10 items
-GET /api/rankings
+GET https://skrivee-backend-assignment.onrender.com/api/rankings
 
 # Get second page with 5 items per page
-GET /api/rankings?page=2&limit=5
+GET https://skrivee-backend-assignment.onrender.com/api/rankings?page=2&limit=5
 
 # Get first page with 20 items
-GET /api/rankings?limit=20
+GET https://skrivee-backend-assignment.onrender.com/api/rankings?limit=20
 ```
 
 Response:
