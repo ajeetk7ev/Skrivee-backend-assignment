@@ -6,10 +6,11 @@ A Node.js/TypeScript backend application for managing author rankings based on v
 
 - **Author Management**: Add and update author information
 - **Dynamic Ranking System**: Real-time calculation of author rankings based on multiple metrics
+- **Pagination Support**: Efficient pagination for large datasets with comprehensive metadata
 - **RESTful API**: Clean API endpoints for all operations
 - **Data Validation**: Input validation using Zod schemas
 - **Database Integration**: MongoDB with Prisma ORM
-- **Testing**: Comprehensive test suite for ranking logic
+- **Testing**: Comprehensive test suite for ranking logic and pagination
 
 ## 🛠️ Tech Stack
 
@@ -106,28 +107,56 @@ Content-Type: application/json
 }
 ```
 
-#### Get Rankings
+#### Get Rankings (with Pagination)
 ```bash
+GET /api/rankings?page=1&limit=10
+```
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 1, minimum: 1)
+- `limit` (optional): Items per page (default: 10, minimum: 1, maximum: 100)
+
+**Examples:**
+```bash
+# Get first page with default 10 items
 GET /api/rankings
+
+# Get second page with 5 items per page
+GET /api/rankings?page=2&limit=5
+
+# Get first page with 20 items
+GET /api/rankings?limit=20
 ```
 
 Response:
 ```json
-[
-  {
-    "id": "author_id",
-    "name": "John Doe",
-    "total_fans": 200,
-    "total_faves": 150,
-    "total_skrivees": 30,
-    "total_skrivees_read": 400,
-    "profile_completeness": 98,
-    "score": 87.5,
-    "rank": 1,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z"
+{
+  "data": [
+    {
+      "id": "author_id",
+      "name": "John Doe",
+      "total_fans": 200,
+      "total_faves": 150,
+      "total_skrivees": 30,
+      "total_skrivees_read": 400,
+      "profile_completeness": 98,
+      "score": 87.5,
+      "rank": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 5,
+    "totalCount": 50,
+    "limit": 10,
+    "hasNextPage": true,
+    "hasPrevPage": false,
+    "nextPage": 2,
+    "prevPage": null
   }
-]
+}
 ```
 
 ## 🏆 Ranking Algorithm Explained
@@ -201,6 +230,39 @@ Assuming these are the maximum values in the dataset:
 
 Author A would rank higher despite having fewer fans because of their superior performance in other metrics.
 
+## 📄 Pagination Features
+
+The `/rankings` endpoint supports comprehensive pagination to handle large datasets efficiently:
+
+### **Pagination Parameters**
+- **page**: Page number (default: 1, minimum: 1)
+- **limit**: Items per page (default: 10, minimum: 1, maximum: 100)
+
+### **Response Structure**
+The paginated response includes:
+- **data**: Array of author objects for the current page
+- **pagination**: Metadata object containing:
+  - `currentPage`: Current page number
+  - `totalPages`: Total number of pages
+  - `totalCount`: Total number of authors
+  - `limit`: Items per page
+  - `hasNextPage`: Boolean indicating if next page exists
+  - `hasPrevPage`: Boolean indicating if previous page exists
+  - `nextPage`: Next page number (null if no next page)
+  - `prevPage`: Previous page number (null if no previous page)
+
+### **Benefits**
+- **Performance**: Only loads required data, reducing memory usage
+- **User Experience**: Faster response times for large datasets
+- **Scalability**: Handles thousands of authors efficiently
+- **Navigation**: Rich metadata for building pagination UI components
+
+### **Error Handling**
+- Invalid page numbers default to 1
+- Invalid limits default to 10
+- Non-numeric values are handled gracefully
+- Maximum limit of 100 prevents abuse
+
 ## 🧪 Testing
 
 Run the test suite:
@@ -213,6 +275,8 @@ The test suite includes:
 - Multiple author ranking calculations
 - Equal score handling
 - Edge cases (zero values, normalization)
+- Pagination parameter validation
+- Invalid input handling for pagination
 
 ## 📁 Project Structure
 

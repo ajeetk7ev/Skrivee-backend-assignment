@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "../config/prisma";
 import { calculateAuthorRankings } from "../utils/rankCalculator";
-import { authorSchema } from "../validators/author.schema";
+import { authorSchema, paginationSchema } from "../validators/author.schema";
 
 export const addAuthor = async (req: Request, res: Response) => {
   try {
@@ -90,7 +90,47 @@ export const updateAuthor = async (req: Request, res: Response) => {
   }
 };
 
-export const getRankings = async (_: Request, res: Response) => {
-  const authors = await prisma.author.findMany({ orderBy: { rank: "asc" } });
-  res.json(authors);
+export const getRankings = async (req: Request, res: Response) => {
+  try {
+    // Validate pagination parameters
+    const parsed = paginationSchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
+    }
+
+    const { page, limit } = parsed.data;
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination metadata
+    const totalCount = await prisma.author.count();
+
+    // Get paginated authors ordered by rank
+    const authors = await prisma.author.findMany({
+      orderBy: { rank: "asc" },
+      skip,
+      take: limit,
+    });
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    res.json({
+      data: authors,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage,
+        nextPage: hasNextPage ? page + 1 : null,
+        prevPage: hasPrevPage ? page - 1 : null,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
